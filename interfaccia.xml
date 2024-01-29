@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <window title="Interfaccia">
+        <layout type="vertical">
+            <login>
+                <label text="Username:" />
+                <lineedit name="username" />
+                <label text="Password:" />
+                <lineedit name="password" />
+                <button text="Login" />
+            </login>
+            <table rows="6" columns="20" />
+        </layout>
+    </window>
+</interface>
