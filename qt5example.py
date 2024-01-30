@@ -1,32 +1,32 @@
-from PyQt5 import QtWidgets, uic, QtCore
 import sys
+from PyQt5 import QtWidgets, uic
+import socket
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
-        uic.loadUi('led.ui', self)
+        uic.loadUi('ele.ui', self)
 
-        # Crea un QTimer
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.toggleRadioButton)
+        self.button = self.findChild(QtWidgets.QPushButton, 'connectButton')
+        self.button.clicked.connect(self.connectButtonPressed)
 
-        # Connetti il segnale clicked del PushButton al metodo startBlinking
-        self.pushButton.clicked.connect(self.startBlinking)
+        self.disconnectButton = self.findChild(QtWidgets.QPushButton, 'disconnectButton')
+        self.disconnectButton.clicked.connect(self.disconnectButtonPressed)
 
         self.show()
 
-    def startBlinking(self):
-        # Avvia il timer per far lampeggiare il RadioButton
-        self.timer.start(500)  # lampeggia ogni 500 millisecondi
+    def connectButtonPressed(self):
+        ip = self.findChild(QtWidgets.QTextEdit, 'IPentry').toPlainText()
+        port = int(self.findChild(QtWidgets.QTextEdit, 'port_entry').toPlainText())
+        mac = self.findChild(QtWidgets.QTextEdit, 'mac_entry').toPlainText()
 
-    def toggleRadioButton(self):
-        # Cambia lo stato del RadioButton
-        self.radioButton.setChecked(not self.radioButton.isChecked())
-        # Aggiorna il QTextBrowser con il colore corrente
-        if self.radioButton.isChecked():
-            self.textBrowser.setText("Verde")
-        else:
-            self.textBrowser.setText("Rosso")
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((ip, port))
+        print(f"Connected to {ip}:{port}")
+
+    def disconnectButtonPressed(self):
+        self.sock.close()
+        print("Disconnected")
 
 app = QtWidgets.QApplication(sys.argv)
 window = Ui()
