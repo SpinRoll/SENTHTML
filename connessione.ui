@@ -239,18 +239,18 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="setting_refresh">
+   <widget class="QFrame" name="manua_commandbox">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>920</y>
+      <y>200</y>
       <width>701</width>
       <height>41</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">border: none;
-background-color: rgba(0, 0, 139, 0.1);
+background-color: rgba(80, 10, 139, 0.3);
     border-radius: 5px; /* Arrotonda gli angoli del pulsante */</string>
     </property>
     <property name="frameShape">
@@ -259,7 +259,53 @@ background-color: rgba(0, 0, 139, 0.1);
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QPushButton" name="refresh_update">
+    <widget class="QLineEdit" name="label_manualcommand">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>113</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: none;
+ background-color: transparent; /* Imposta il colore di sfondo del pulsante */
+</string>
+     </property>
+     <property name="text">
+      <string>Manual Command</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>10</y>
+       <width>221</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_13">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>0</y>
+       <width>61</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: none;
+ background-color: transparent; /* Imposta il colore di sfondo del pulsante */
+</string>
+     </property>
+     <property name="text">
+      <string>Channel</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="sendcommand">
      <property name="geometry">
       <rect>
        <x>600</x>
@@ -276,128 +322,24 @@ background-color: rgba(0, 0, 139, 0.1);
 </string>
      </property>
      <property name="text">
-      <string>update</string>
+      <string>Send</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="refresh_secondi">
+    <widget class="QSpinBox" name="channelselection">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>420</x>
        <y>10</y>
        <width>42</width>
        <height>22</height>
       </rect>
      </property>
     </widget>
-    <widget class="QLineEdit" name="refresh_label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>0</y>
-       <width>113</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">border: none;
- background-color: transparent; /* Imposta il colore di sfondo del pulsante */
-</string>
-     </property>
-     <property name="text">
-      <string>refresh ogni (secondi)</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QFrame" name="micro_box">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>970</y>
-      <width>701</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border: none;
-background-color: rgba(0, 0, 139, 0.1);
-    border-radius: 5px; /* Arrotonda gli angoli del pulsante */</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QLineEdit" name="microlabel">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>0</y>
-       <width>113</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">border: none;
- background-color: transparent; /* Imposta il colore di sfondo del pulsante */
-</string>
-     </property>
-     <property name="text">
-      <string>OTX SV Module Setting</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="Micro_ENABLE">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>10</y>
-       <width>51</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>ENABLE</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="Micro_DISABLE">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>10</y>
-       <width>51</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>DISABLE</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="Micro_SLEEP">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>10</y>
-       <width>51</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>SLEEP</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="Micro_WAKE">
-     <property name="geometry">
-      <rect>
-       <x>320</x>
-       <y>10</y>
-       <width>51</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>WAKE UP</string>
-     </property>
-    </widget>
+    <zorder>label_manualcommand</zorder>
+    <zorder>lineEdit_13</zorder>
+    <zorder>sendcommand</zorder>
+    <zorder>channelselection</zorder>
+    <zorder>comboBox</zorder>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

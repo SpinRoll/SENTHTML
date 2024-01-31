@@ -8,4 +8,6 @@ def load_config():
     port = config.get('Connection', 'port')
     mac = config.get('Connection', 'mac')
 
-    return ip, port, mac
+    commands = [config.get('Command', key) for key in config['Command']]
+
+    return ip, port, mac, commands
