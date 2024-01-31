@@ -6,3 +6,5 @@ def send_command(connection, command, channel):
         message = command + str(channel) + '\r\n'
         print(message);
     connection.send(message)
+    response = connection.receive()  # Ricevi la risposta dal server
+    return response
