@@ -1,10 +1,16 @@
 from PyQt5 import QtWidgets, uic
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5 import QtCore
 import sys
 import connessione
 import loadINI
 import manualcommand
 import setIP
 import micro  #  importare il modulo micro
+import telemetria  # Assicurati di importare il modulo telemetria
+import toggle
+import SLEEP
+
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -27,11 +33,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.NewIP_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.micro_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.show()
-
+        # Connetti il segnale clicked del pulsante al metodo save_log
+        self.save_log.clicked.connect(self.save_loggi)
         self.clear_log.clicked.connect(self.clear)  # Connetti il segnale al metodo clear_log
         self.disconnectButton.clicked.connect(self.disconnect)
         self.connectButton.clicked.connect(self.connect)
-
+        self.refresh_update.clicked.connect(self.start_refresh)
         self.sendcommand.clicked.connect(self.send_command)  # Connetti il segnale al metodo send_command
 
         self.set_newip_button.clicked.connect(self.set_ip_address)  # Aggiungi questa riga
@@ -41,6 +48,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.Micro_DISABLE.clicked.connect(lambda: self.handle_micro_button('DISPIC', self.Micro_DISABLE, "red"))
         self.Micro_SLEEP.clicked.connect(lambda: self.handle_micro_button('SLEEPSV', self.Micro_SLEEP, "yellow"))
         self.Micro_WAKE.clicked.connect(lambda: self.handle_micro_button('WAKESV', self.Micro_WAKE, "lightblue"))
+
+        self.refresh_secondi.setMinimum(1)  # Imposta il valore minimo a 1
+        self.refresh_secondi.setValue(1)
+
+        # Crea un timer
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.refresh_update_fn)
+
+        self.CH_ENABLE_1.setText("OFF")  # Imposta il testo iniziale a "OFF"
+        self.CH_ENABLE_1.clicked.connect(self.ENCHANNEL)  # Collega il segnale clicked alla funzione toggle_channel
+        self.CH_ENABLE_2.setText("OFF")  # Imposta il testo iniziale a "OFF"
+        self.CH_ENABLE_2.clicked.connect(self.ENCHANNEL)  # Collega il segnale clicked alla funzione toggle_channel
+
+        self.CH_SLEEP_WAKE_1.setText("W/S")  # Imposta il testo iniziale a "OFF"
+        self.CH_SLEEP_WAKE_1.clicked.connect(self.SLEEPCHANNEL)  # Collega il segnale clicked alla funzione toggle_channel
+        self.CH_SLEEP_WAKE_2.setText("W/S")  # Imposta il testo iniziale a "OFF"
+        self.CH_SLEEP_WAKE_2.clicked.connect(self.SLEEPCHANNEL)  # Collega il segnale clicked alla funzione toggle_channel
 
     def connect(self):
         ip = self.IPentry.toPlainText()
@@ -139,6 +163,49 @@ class MainWindow(QtWidgets.QMainWindow):
         # Aggiungi la risposta al QTextBrowser
         self.textBrowser.append(result)
 
+    def save_loggi(self):
+        # Apri la finestra di dialogo per scegliere dove salvare il file
+        filename, _ = QFileDialog.getSaveFileName(self, "Salva log", "", "File di testo (*.txt);;Tutti i file (*)")
+
+        if filename:
+            # Se l'utente ha scelto un file, salva il contenuto del QTextBrowser in quel file
+            with open(filename, 'w') as f:
+                f.write(self.textBrowser.toPlainText())
+
+    def start_refresh(self):
+        # Ottieni il numero di secondi dal QSpinBox
+        seconds = self.refresh_secondi.value()
+        # Avvia il timer per chiamare refresh_update ogni tot secondi
+        self.timer.start(seconds * 1000)  # moltiplica per 1000 per convertire in millisecondi
+    def refresh_update_fn(self):
+        data = telemetria.request_data(self.connection)
+
+        if data:
+            # Aggiorna i widget con i primi due set di dati
+            self.VAL1_1.setText(str(data[0][0]))
+            self.VAL1_2.setText(str(data[0][1]))
+            self.VAL1_3.setText(str(data[0][2]))
+            self.VAL1_4.setText(str(data[0][3]))
+            self.VAL1_5.setText(str(data[0][4]))
+            self.VAL2_1.setText(str(data[1][0]))
+            self.VAL2_2.setText(str(data[1][1]))
+            self.VAL2_3.setText(str(data[1][2]))
+            self.VAL2_4.setText(str(data[1][3]))
+            self.VAL2_5.setText(str(data[1][4]))
+
+    def ENCHANNEL(self):
+
+        channel_number = int(self.sender().objectName().split('_')[-1])
+
+        # Chiama la funzione toggle_channel da toggle.py
+        toggle.toggle_channel(self.connection, self.sender(), channel_number, self.send_command)
+
+    def SLEEPCHANNEL(self):
+
+        sleep_channel_number = int(self.sender().objectName().split('_')[-1])
+
+        # Chiama la funzione toggle_channel da toggle.py
+        SLEEP.sleep_channel(self.connection, self.sender(), sleep_channel_number, self.send_command)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
