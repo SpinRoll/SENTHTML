@@ -4,7 +4,7 @@ import connessione
 import loadINI
 import manualcommand
 import setIP
-from PyQt5.QtCore import Qt
+import micro  #  importare il modulo micro
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -34,6 +34,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sendcommand.clicked.connect(self.send_command)  # Connetti il segnale al metodo send_command
 
         self.set_newip_button.clicked.connect(self.set_ip_address)  # Aggiungi questa riga
+
+        # Connetti i segnali dei pulsanti alle funzioni appropriate
+        self.Micro_ENABLE.clicked.connect(lambda: self.handle_micro_button('ENPIC', self.Micro_ENABLE, "lightgreen"))
+        self.Micro_DISABLE.clicked.connect(lambda: self.handle_micro_button('DISPIC', self.Micro_DISABLE, "red"))
+        self.Micro_SLEEP.clicked.connect(lambda: self.handle_micro_button('SLEEPSV', self.Micro_SLEEP, "yellow"))
+        self.Micro_WAKE.clicked.connect(lambda: self.handle_micro_button('WAKESV', self.Micro_WAKE, "lightblue"))
 
     def connect(self):
         ip = self.IPentry.toPlainText()
@@ -93,7 +99,23 @@ class MainWindow(QtWidgets.QMainWindow):
         # Aggiungi la risposta al QTextBrowser
         self.textBrowser.append(response)
 
-
+    def handle_micro_button(self, command, button, color):
+        result = micro.send_micro_command(self.connection, command)
+        if "è stato impostato correttamente" in result:
+            # Se il comando è stato impostato correttamente, colora il pulsante
+            button.setStyleSheet(f"background-color: {color}")
+            # Disabilita tutti i pulsanti
+            self.Micro_ENABLE.setEnabled(False)
+            self.Micro_DISABLE.setEnabled(False)
+            self.Micro_SLEEP.setEnabled(False)
+            self.Micro_WAKE.setEnabled(False)
+            # Abilita il pulsante corrispondente
+            button.setEnabled(True)
+        else:
+            # Gestisci il caso in cui il comando non sia stato impostato correttamente
+            print(result)  # Stampa l'errore
+        # Aggiungi la risposta al QTextBrowser
+        self.textBrowser.append(result)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

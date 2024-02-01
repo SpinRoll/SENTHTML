@@ -534,6 +534,97 @@ background-color: rgba(0, 0, 139, 0.1);
      </property>
     </widget>
    </widget>
+   <widget class="QFrame" name="micro_box">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>620</y>
+      <width>701</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: none;
+background-color: rgba(0, 0, 139, 0.1);
+    border-radius: 5px; /* Arrotonda gli angoli del pulsante */</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLineEdit" name="microlabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>113</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: none;
+ background-color: transparent; /* Imposta il colore di sfondo del pulsante */
+</string>
+     </property>
+     <property name="text">
+      <string>OTX SV Module Setting</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Micro_ENABLE">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>10</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ENABLE</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Micro_DISABLE">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>10</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DISABLE</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Micro_SLEEP">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>10</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>SLEEP</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Micro_WAKE">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>10</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>WAKE UP</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
