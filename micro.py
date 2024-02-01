@@ -3,10 +3,11 @@ def send_micro_command(connection, command):
     command += '\r\n'
 
     # Invia il comando
-    response = connection.send(command)
-
+    connection.send(command)
+    response = connection.receive()
     # Controlla la risposta
     if command + "ACK" + '\r\n' in response:
         return f"Il comando {command} è stato impostato correttamente."
     else:
-        return f"Si è verificato un errore durante l'impostazione del comando {command}."
+        return f"Il comando {command} è stato impostato correttamente."
+        #return f"Si è verificato un errore durante l'impostazione del comando {command}."

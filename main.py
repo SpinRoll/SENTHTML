@@ -25,6 +25,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.manua_commandbox.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.LOG_BOX.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.NewIP_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
+        self.micro_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.show()
 
         self.clear_log.clicked.connect(self.clear)  # Connetti il segnale al metodo clear_log
@@ -56,6 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.manua_commandbox.setEnabled(True)  # Abilita manua_commandbox quando la connessione è stabilita
             self.LOG_BOX.setEnabled(True)  # abilita manua_commandbox all'avvio
             self.NewIP_box.setEnabled(True)  # abilita manua_commandbox all'avvio
+            self.micro_box.setEnabled(True)  # abilita manua_commandbox all'avvio
 
 
 
@@ -75,6 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.manua_commandbox.setEnabled(False)  # Disabilita manua_commandbox quando la connessione viene chiusa
         self.LOG_BOX.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.NewIP_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
+        self.micro_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
 
     def send_command(self):
         command = self.comboBox.currentText()
@@ -101,21 +104,41 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def handle_micro_button(self, command, button, color):
         result = micro.send_micro_command(self.connection, command)
+
         if "è stato impostato correttamente" in result:
             # Se il comando è stato impostato correttamente, colora il pulsante
             button.setStyleSheet(f"background-color: {color}")
-            # Disabilita tutti i pulsanti
-            self.Micro_ENABLE.setEnabled(False)
-            self.Micro_DISABLE.setEnabled(False)
-            self.Micro_SLEEP.setEnabled(False)
-            self.Micro_WAKE.setEnabled(False)
             # Abilita il pulsante corrispondente
             button.setEnabled(True)
+
+            # Se il pulsante "enable" o "sleep" è stato premuto, disabilita il pulsante "disable" o "wake"
+            if button == self.Micro_ENABLE:
+                self.Micro_DISABLE.setStyleSheet("")
+                self.Micro_DISABLE.setEnabled(True)
+            elif button == self.Micro_SLEEP:
+                self.Micro_WAKE.setStyleSheet("")
+                self.Micro_WAKE.setEnabled(True)
+
+            # Se il pulsante "disable" è stato premuto, disabilita i pulsanti "enable", "wake" e "sleep"
+            elif button == self.Micro_DISABLE:
+                self.Micro_ENABLE.setStyleSheet("")
+                self.Micro_ENABLE.setEnabled(True)
+                self.Micro_SLEEP.setStyleSheet("")
+                self.Micro_SLEEP.setEnabled(True)
+                self.Micro_WAKE.setStyleSheet("")
+                self.Micro_WAKE.setEnabled(True)
+
+            # Se il pulsante "wake" è stato premuto, disabilita il pulsante "sleep"
+            elif button == self.Micro_WAKE:
+                self.Micro_SLEEP.setStyleSheet("")
+                self.Micro_SLEEP.setEnabled(True)
         else:
             # Gestisci il caso in cui il comando non sia stato impostato correttamente
             print(result)  # Stampa l'errore
+
         # Aggiungi la risposta al QTextBrowser
         self.textBrowser.append(result)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

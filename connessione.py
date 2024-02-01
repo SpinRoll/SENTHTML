@@ -4,9 +4,11 @@ class Connection:
     def __init__(self):
         self.sock = None
 
-    def connect(self, ip, port):
+    def connect(self, ip, port, timeout=1):
         print(f"Tentativo di connessione a IP: {ip}, Porta: {port}")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(timeout)  # Imposta il timeout del socket
+
         try:
             self.sock.connect((ip, int(port)))  # Assicurati che la porta sia un intero
             return 'online'
