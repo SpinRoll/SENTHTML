@@ -1,17 +1,24 @@
-def sleep_channel(connection, button, channel_number, send_command):
+def sleep_channel(connection, button, channel_number, send_command, type_orx_selected):
     # Controlla lo stato attuale del pulsante
     if button.text() == "W":
-        # Se è "OFF", invia il comando "ENOTX+m+CR+LF", cambia il testo in "ON" e il colore in verde
-        connection.send(f"ENOTX{channel_number}+CR+LF")
-        print(f"SLEEPOTX{channel_number}+CR+LF")
+        # Se è "OFF", invia il comando appropriato, cambia il testo in "ON" e il colore in verde
+        if type_orx_selected:
+            command = f"SLEEPORX{channel_number}+CR+LF"
+        else:
+            command = f"SLEEPOTX{channel_number}+CR+LF"
+        connection.send(command)
+        print(command)
 
         button.setText("S")
         button.setStyleSheet("background-color: lightyellow")
     else:
-        # Se è "ON", invia il comando "DISOTX+m+CR+LF", cambia il testo in "OFF" e il colore in rosso
-        connection.send(f"DISOTX{channel_number}+CR+LF")
-        print(f"WAKEOTX{channel_number}+CR+LF")
+        # Se è "ON", invia il comando appropriato, cambia il testo in "OFF" e il colore in rosso
+        if type_orx_selected:
+            command = f"WAKEORX{channel_number}+CR+LF"
+        else:
+            command = f"WAKEOTX{channel_number}+CR+LF"
+        connection.send(command)
+        print(command)
 
         button.setText("W")
         button.setStyleSheet("background-color: lightblue")
-        #button.setStyleSheet("")

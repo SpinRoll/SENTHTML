@@ -28,7 +28,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Dividi l'indirizzo IP in blocchi
         ip_blocks = set_ip.split('.')
 
-        self.type_otx.setChecked(True)
+        self.type_orx.setChecked(True)
 
         # Inserisci ciascun blocco in un diverso QTextEdit
         self.ip.setText(ip_blocks[0])
@@ -41,6 +41,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.button_group = QButtonGroup()
         self.button_group.addButton(self.type_orx)
         self.button_group.addButton(self.type_otx)
+
+        self.TEL_1.setText('-')
+        self.TEL_2.setText('-')
+        self.TEL_3.setText('-')
+        self.TEL_4.setText('-')
+        self.TEL_5.setText('-')
         # Crea un QCompleter
         completer = QCompleter()
 
@@ -83,6 +89,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.refresh_update_fn)
         self.refresh_stop.clicked.connect(self.stop_refresh)
 
+        # Inizializza i canali
+        for i in range(1, 21):
+            getattr(self, f"CH_ENABLE_{i}").setText("OFF")
+            getattr(self, f"CH_ENABLE_{i}").clicked.connect(self.ENCHANNEL)
+            getattr(self, f"CH_SLEEP_WAKE_{i}").setText("W/S")
+            getattr(self, f"CH_SLEEP_WAKE_{i}").clicked.connect(self.SLEEPCHANNEL)
+
+        '''
         self.CH_ENABLE_1.setText("OFF")  # Imposta il testo iniziale a "OFF"
         self.CH_ENABLE_1.clicked.connect(self.ENCHANNEL)  # Collega il segnale clicked alla funzione toggle_channel
         self.CH_ENABLE_2.setText("OFF")  # Imposta il testo iniziale a "OFF"
@@ -92,6 +106,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.CH_SLEEP_WAKE_1.clicked.connect(self.SLEEPCHANNEL)  # Collega il segnale clicked alla funzione toggle_channel
         self.CH_SLEEP_WAKE_2.setText("W/S")  # Imposta il testo iniziale a "OFF"
         self.CH_SLEEP_WAKE_2.clicked.connect(self.SLEEPCHANNEL)  # Collega il segnale clicked alla funzione toggle_channel
+        '''
+
 
     def connect(self):
         ip = self.IPentry.toPlainText()
@@ -128,7 +144,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.connectButton.setEnabled(True)
         self.disconnectButton.setEnabled(False)
         self.manua_commandbox.setEnabled(False)  # Disabilita manua_commandbox quando la connessione viene chiusa
-        self.LOG_BOX.setEnabled(False)  # Disabilita manua_commandbox all'avvio
+        #self.LOG_BOX.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.NewIP_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.micro_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.TELEMETRIA.setEnabled(False)  # Disabilita manua_commandbox all'avvio
@@ -229,32 +245,59 @@ class MainWindow(QtWidgets.QMainWindow):
         ip, port, mac, commands, set_ip, otx_thresholds, orx_thresholds = loadINI.load_config()
 
         # Stampa i dizionari delle soglie
-        print("OTX thresholds:", otx_thresholds)
-        print("ORX thresholds:", orx_thresholds)
+        #print("OTX thresholds:", otx_thresholds)
+        #print("ORX thresholds:", orx_thresholds)
 
         if data:
             # Controlla se i dati rientrano nelle soglie
             if self.type_orx.isChecked():
                 thresholds = orx_thresholds
+                self.TEL_5.hide()
+                self.CANALE_15.show()
+                self.CANALE_16.show()
+                self.CANALE_17.show()
+                self.CANALE_18.show()
+                self.CANALE_19.show()
+                self.CANALE_20.show()
                 threshold_keys = ['totcurr', 'lnacurr', 'pdcurr', 'brdtemp']
+                num_values = 4  # 4 valori per orx
+                num_channels = 20  # 20 canali per orx
             elif self.type_otx.isChecked():
+                self.TEL_5.show()
+                self.CANALE_15.hide()
+                self.CANALE_16.hide()
+                self.CANALE_17.hide()
+                self.CANALE_18.hide()
+                self.CANALE_19.hide()
+                self.CANALE_20.hide()
                 thresholds = otx_thresholds
                 threshold_keys = ['lastemp', 'lascurr', 'teccurr', 'lnacurr', 'totcurr']
+                num_values = 5  # 5 valori per otx
+                num_channels = 14  # 14 canali per otx
 
-            print('ok')
-            for j in range(1, 3):  # Itera su tutti i gruppi di valori VAL
+            # Imposta il testo di ogni QLineEdit con il nome della label corrispondente
+            for i, key in enumerate(threshold_keys):
+                getattr(self, f'TEL_{i + 1}').setText(key.upper())
+
+            for j in range(1, num_channels + 1):  # Itera su tutti i gruppi di valori VAL
+
+                if self.type_orx.isChecked():
+                    getattr(self, f'VAL{j}_5').hide()
+                elif self.type_otx.isChecked():
+                    getattr(self, f'VAL{j}_5').show()
+
                 # Ripristina il colore di sfondo dei widget
                 for i in range(5):
                     getattr(self, f'VAL{j}_{i + 1}').setStyleSheet("")
 
                 # Aggiorna i widget con i primi due set di dati
-                for i in range(5):
+                for i in range(num_values):
                     getattr(self, f'VAL{j}_{i + 1}').setText(str(data[j - 1][i]))
 
                 for i, key in enumerate(threshold_keys):
-                    print(f"Checking value {i + 1}...")
-                    print(f"Thresholds: {thresholds[key][0]} - {thresholds[key][1]}")
-                    print(f"Data: {data[j - 1][i]}")
+                    #print(f"Checking value {i + 1}...")
+                    #print(f"Thresholds: {thresholds[key][0]} - {thresholds[key][1]}")
+                    #print(f"Data: {data[j - 1][i]}")
                     if not (thresholds[key][0] <= float(data[j - 1][i]) <= thresholds[key][1]):
                         print(f"Valore {i + 1} fuori dalle soglie!")
                         getattr(self, f'VAL{j}_{i + 1}').setStyleSheet("background-color: lightyellow")
@@ -273,7 +316,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sleep_channel_number = int(self.sender().objectName().split('_')[-1])
 
         # Chiama la funzione toggle_channel da toggle.py
-        SLEEP.sleep_channel(self.connection, self.sender(), sleep_channel_number, self.send_command)
+        SLEEP.sleep_channel(self.connection, self.sender(), sleep_channel_number, self.send_command, self.type_orx.isChecked())
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
