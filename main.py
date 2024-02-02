@@ -1,5 +1,7 @@
 from PyQt5 import QtWidgets, uic
+from PyQt5.QtWidgets import QCompleter
 from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QButtonGroup
 from PyQt5 import QtCore
 import sys
 import connessione
@@ -16,15 +18,37 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         uic.loadUi('connessione.ui', self)
-
-        ip, port, mac, commands = loadINI.load_config()
+        ip, port, mac, commands, set_ip, otx_thresholds, orx_thresholds = loadINI.load_config()
         self.IPentry.setText(ip)
         self.port_entry.setText(port)
         self.mac_entry.setText(mac)
         self.comboBox.addItems(commands)
+        self.comboBox.setEditable(True)
+
+        # Dividi l'indirizzo IP in blocchi
+        ip_blocks = set_ip.split('.')
+
+        self.type_otx.setChecked(True)
+
+        # Inserisci ciascun blocco in un diverso QTextEdit
+        self.ip.setText(ip_blocks[0])
+        self.ip_2.setText(ip_blocks[1])
+        self.ip_3.setText(ip_blocks[2])
+        self.ip_4.setText(ip_blocks[3])
 
         self.connection = connessione.Connection()  # Crea un'istanza della classe Connection
 
+        self.button_group = QButtonGroup()
+        self.button_group.addButton(self.type_orx)
+        self.button_group.addButton(self.type_otx)
+        # Crea un QCompleter
+        completer = QCompleter()
+
+        # Imposta il modello del completatore per corrispondere a quello del combobox
+        completer.setModel(self.comboBox.model())
+
+        # Imposta il completatore per il combobox
+        self.comboBox.setCompleter(completer)
 
         #self.manual_commandbox = manualcommand.manua_commandbox(self)  # Crea un'istanza della classe manua_commandbox
 
@@ -32,6 +56,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LOG_BOX.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.NewIP_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.micro_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
+        self.TELEMETRIA.setEnabled(False)
+        self.setting_refresh.setEnabled(False)
         self.show()
         # Connetti il segnale clicked del pulsante al metodo save_log
         self.save_log.clicked.connect(self.save_loggi)
@@ -45,7 +71,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Connetti i segnali dei pulsanti alle funzioni appropriate
         self.Micro_ENABLE.clicked.connect(lambda: self.handle_micro_button('ENPIC', self.Micro_ENABLE, "lightgreen"))
-        self.Micro_DISABLE.clicked.connect(lambda: self.handle_micro_button('DISPIC', self.Micro_DISABLE, "red"))
+        self.Micro_DISABLE.clicked.connect(lambda: self.handle_micro_button('DISPIC', self.Micro_DISABLE, "orange"))
         self.Micro_SLEEP.clicked.connect(lambda: self.handle_micro_button('SLEEPSV', self.Micro_SLEEP, "yellow"))
         self.Micro_WAKE.clicked.connect(lambda: self.handle_micro_button('WAKESV', self.Micro_WAKE, "lightblue"))
 
@@ -55,6 +81,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Crea un timer
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.refresh_update_fn)
+        self.refresh_stop.clicked.connect(self.stop_refresh)
 
         self.CH_ENABLE_1.setText("OFF")  # Imposta il testo iniziale a "OFF"
         self.CH_ENABLE_1.clicked.connect(self.ENCHANNEL)  # Collega il segnale clicked alla funzione toggle_channel
@@ -82,6 +109,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.LOG_BOX.setEnabled(True)  # abilita manua_commandbox all'avvio
             self.NewIP_box.setEnabled(True)  # abilita manua_commandbox all'avvio
             self.micro_box.setEnabled(True)  # abilita manua_commandbox all'avvio
+            self.TELEMETRIA.setEnabled(True)
+            self.setting_refresh.setEnabled(True)
 
 
 
@@ -102,6 +131,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LOG_BOX.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.NewIP_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
         self.micro_box.setEnabled(False)  # Disabilita manua_commandbox all'avvio
+        self.TELEMETRIA.setEnabled(False)  # Disabilita manua_commandbox all'avvio
+        self.setting_refresh.setEnabled(False)
+        self.timer.stop()
 
     def send_command(self):
         command = self.comboBox.currentText()
@@ -173,32 +205,68 @@ class MainWindow(QtWidgets.QMainWindow):
                 f.write(self.textBrowser.toPlainText())
 
     def start_refresh(self):
+        # Controlla se uno dei radio button è selezionato
+        if not self.type_orx.isChecked() and not self.type_otx.isChecked():
+            print("Nessun tipo selezionato!")
+            return
+
         # Ottieni il numero di secondi dal QSpinBox
         seconds = self.refresh_secondi.value()
         # Avvia il timer per chiamare refresh_update ogni tot secondi
         self.timer.start(seconds * 1000)  # moltiplica per 1000 per convertire in millisecondi
+
+    def stop_refresh(self):
+        self.timer.stop()
+
     def refresh_update_fn(self):
-        data = telemetria.request_data(self.connection)
+
+        # Controlla se uno dei radio button è selezionato
+        if not self.type_orx.isChecked() and not self.type_otx.isChecked():
+            print("Nessun tipo selezionato!")
+            return
+
+        data = telemetria.request_data(self.connection, self.type_orx.isChecked())
+        ip, port, mac, commands, set_ip, otx_thresholds, orx_thresholds = loadINI.load_config()
+
+        # Stampa i dizionari delle soglie
+        print("OTX thresholds:", otx_thresholds)
+        print("ORX thresholds:", orx_thresholds)
 
         if data:
-            # Aggiorna i widget con i primi due set di dati
-            self.VAL1_1.setText(str(data[0][0]))
-            self.VAL1_2.setText(str(data[0][1]))
-            self.VAL1_3.setText(str(data[0][2]))
-            self.VAL1_4.setText(str(data[0][3]))
-            self.VAL1_5.setText(str(data[0][4]))
-            self.VAL2_1.setText(str(data[1][0]))
-            self.VAL2_2.setText(str(data[1][1]))
-            self.VAL2_3.setText(str(data[1][2]))
-            self.VAL2_4.setText(str(data[1][3]))
-            self.VAL2_5.setText(str(data[1][4]))
+            # Controlla se i dati rientrano nelle soglie
+            if self.type_orx.isChecked():
+                thresholds = orx_thresholds
+                threshold_keys = ['totcurr', 'lnacurr', 'pdcurr', 'brdtemp']
+            elif self.type_otx.isChecked():
+                thresholds = otx_thresholds
+                threshold_keys = ['lastemp', 'lascurr', 'teccurr', 'lnacurr', 'totcurr']
+
+            print('ok')
+            for j in range(1, 3):  # Itera su tutti i gruppi di valori VAL
+                # Ripristina il colore di sfondo dei widget
+                for i in range(5):
+                    getattr(self, f'VAL{j}_{i + 1}').setStyleSheet("")
+
+                # Aggiorna i widget con i primi due set di dati
+                for i in range(5):
+                    getattr(self, f'VAL{j}_{i + 1}').setText(str(data[j - 1][i]))
+
+                for i, key in enumerate(threshold_keys):
+                    print(f"Checking value {i + 1}...")
+                    print(f"Thresholds: {thresholds[key][0]} - {thresholds[key][1]}")
+                    print(f"Data: {data[j - 1][i]}")
+                    if not (thresholds[key][0] <= float(data[j - 1][i]) <= thresholds[key][1]):
+                        print(f"Valore {i + 1} fuori dalle soglie!")
+                        getattr(self, f'VAL{j}_{i + 1}').setStyleSheet("background-color: lightyellow")
+                        # Aggiungi la risposta al QTextBrowser
+                        self.textBrowser.append(f"Canale {j}, Tipo {key}, {data[j - 1][i]}  fuori dalle soglie!")
 
     def ENCHANNEL(self):
-
         channel_number = int(self.sender().objectName().split('_')[-1])
 
-        # Chiama la funzione toggle_channel da toggle.py
-        toggle.toggle_channel(self.connection, self.sender(), channel_number, self.send_command)
+        # Passa lo stato del radio button alla funzione toggle_channel
+        toggle.toggle_channel(self.connection, self.sender(), channel_number, self.send_command,self.type_orx.isChecked())
+
 
     def SLEEPCHANNEL(self):
 

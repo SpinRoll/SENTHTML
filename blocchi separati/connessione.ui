@@ -286,6 +286,13 @@ background-color: rgba(80, 10, 139, 0.3);
        <height>22</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">    QComboBox QAbstractItemView {
+        background-color: lightblue;
+    }
+
+</string>
+     </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_13">
      <property name="geometry">
@@ -1131,6 +1138,26 @@ background-color: rgba(0, 0, 139, 0.1);
      </property>
      <property name="text">
       <string>refresh ogni (secondi)</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="refresh_stop">
+     <property name="geometry">
+      <rect>
+       <x>490</x>
+       <y>10</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+    border-radius: 10px; /* Arrotonda gli angoli del pulsante */
+    background-color: #FFFFFF; /* Imposta il colore di sfondo del pulsante */
+}
+</string>
+     </property>
+     <property name="text">
+      <string>stop</string>
      </property>
     </widget>
    </widget>
