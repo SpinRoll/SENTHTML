@@ -8,7 +8,8 @@ def set_ip(connection, ip1, ip2, ip3, ip4):
     #print(command)
 
     # Invia il comando
-    response = connection.send(command)
+    connection.send(command)
+    response = connection.receive()
 
     # Controlla la risposta
     if response == "IPSETACK" + '\r\n':

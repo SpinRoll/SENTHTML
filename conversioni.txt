@@ -1,0 +1,14 @@
+orx
+
+board current=(valore letto*3.3/1024)/(20*0.18)
+lna current= =(valore letto*3.3/1024)/(20*0.68)
+photodiode curr= = valore letto+1+2
+board temp= valore letto+1+2
+
+otx
+
+Laser Temperature reading = =(-8*valore letto*3.3/1024)+39
+Laser Current reading = =(valore letto*3.3/1024)/(20*0.15)
+TEC Current reading = =1.5+valore letto*3.3/1024
+LNA Current reading = (valore letto*3.3/1024)/(20*0.68)
+Board Current monitoring = (valore letto*3.3/1024)/(20*0.18)

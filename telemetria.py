@@ -19,13 +19,15 @@ def request_data(connection, type_orx_selected):
     print(command)
     print(payload_length)
 
-    #connection.send(command.encode())
+    connection.send(command.encode())
 
-    payload = generate_payload(payload_length)
-    data = command.strip() + payload + '\r\n'
-    response = data
+    #payload = generate_payload(payload_length)
+    #data = command.strip() + payload + '\r\n'
+    #response = data
+
+    response = connection.receive()
     print(response)
-    #response = connection.receive()
+
 
     # Estrai il payload dalla risposta
     if response.startswith(command.strip()) and response.endswith('\r\n'):
@@ -36,6 +38,14 @@ def request_data(connection, type_orx_selected):
 
         # Organizza i valori in gruppi di 5 (TOTCURR, LNACURR, PDCURR, BRDTEMP)
         data = [values[i:i+gruppi] for i in range(0, len(values), gruppi)]
+
+        for i in range(len(data)):
+            if type_orx_selected:
+                # ORX
+                data[i] = ((data[i][0]*3.3/1024)/(20*0.18), (data[i][1]*3.3/1024)/(20*0.68), data[i][2]+1+2, data[i][3]+1+2)
+            else:
+                # OTX
+                data[i] = ((-8*data[i][0]*3.3/1024)+39, (data[i][1]*3.3/1024)/(20*0.15), 1.5+data[i][2]*3.3/1024, (data[i][3]*3.3/1024)/(20*0.68), (data[i][4]*3.3/1024)/(20*0.18))
 
         return data
 
