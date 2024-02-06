@@ -1,0 +1,30 @@
+Il comando ENPIC
+ � stato impostato correttamente.
+Il comando DISPIC
+ � stato impostato correttamente.
+Il comando SLEEPSV
+ � stato impostato correttamente.
+Il comando WAKESV
+
+
+pyinstaller main.py --noconsole --onefile
+
+ � stato impostato correttamente.
+Il comando SLEEPSV
+ � stato impostato correttamente.
+Il comando DISPIC
+ � stato impostato correttamente.
+Il comando ENPIC
+ � stato impostato correttamente.
+Il comando ENPIC
+ � stato impostato correttamente.
+Il comando DISPIC
+ � stato impostato correttamente.
+Il comando SLEEPSV
+ � stato impostato correttamente.
+Il comando WAKESV
+ � stato impostato correttamente.
+Il comando SLEEPSV
+ � stato impostato correttamente.
+Il comando DISPIC
+ � stato impostato correttamente.
